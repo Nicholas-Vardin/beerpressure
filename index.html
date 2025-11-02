@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beer Pressure</title>
+    <!-- Google Fonts - Irish Grover for the title -->
+    <link href="https://fonts.googleapis.com/css2?family=Irish+Grover&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Header styling */
+        header {
+            background: #333;
+            color: white;
+            padding: 6px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        .header-title {
+            font-family: 'Irish Grover', cursive;
+            font-size: 22px;
+            margin: 0;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #ff6b35;
+            text-shadow: 0 0 10px rgba(255, 107, 53, 0.5);
+        }
+
+        .header-title:hover {
+            transform: scale(1.05);
+            text-shadow: 0 0 20px rgba(255, 107, 53, 0.8);
+        }
+
+        /* User info styling */
+        #userInfo {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        /* Profile display with picture */
+        .profile-display {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: white;
+        }
+
+        .profile-display:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .profile-display img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid white;
+            object-fit: cover;
+        }
+
+        .profile-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .profile-name {
+            font-size: 14px;
+            font-weight: bold;
+            line-height: 1.2;
+        }
+
+        .profile-email {
+            font-size: 11px;
+            opacity: 0.8;
+            line-height: 1.2;
+        }
+
+        /* Logout button */
+        .logout-btn {
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: #cc0000;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 68, 68, 0.4);
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            #userInfo {
+                gap: 10px;
+            }
+
+            .profile-display {
+                padding: 6px 12px;
+            }
+
+            .profile-email {
+                display: none;
+            }
+
+            .header-title {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1 class="header-title" onclick="window.location.href='index.html'">🍺 Beer Pressure</h1>
+        <div id="userInfo"></div>
+    </header>
+        
+        <!-- Main container -->
+        <div class="container">
+            <!-- You can now remove or keep this neon title -->
+            <!-- <h1 class="neon-title">Beer Pressure</h1> -->
+
+            <!-- Webcam video element -->
+            <div class="video-container" style="height: 60vh; max-height: 60vh; width: 90vw; max-width: 900px;">
+                <video id="webcam" autoplay playsinline style="height: 100%; width: 100%; object-fit: contain;"></video>
+                <button id="startCamera" class="start-button">Start Camera</button>
+            </div>
+
+
+            <!-- STOP button only -->
+            <div style="display: flex; justify-content: center; align-items: center; margin: 20px 0;">
+                <button id="emergencyStop" style="background: #ff4444; color: white; border: none; border-radius: 6px; padding: 10px 24px; font-size: 1.1rem; font-weight: bold; cursor: pointer; box-shadow: 0 2px 8px #0003;">STOP</button>
+            </div>
+
+            <!-- Mascot popup container -->
+            <div id="mascotPopup" style="display:none; position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); z-index:1000;"></div>
+
+            <!-- Beer Points UI -->
+            <div id="beerPointsBox" style="position:fixed; top:200px; right:40px; background:#222; color:#FFD700; border-radius:12px; box-shadow:0 2px 8px #0006; padding:18px 28px; font-size:2rem; font-family:'Irish Grover',cursive; z-index:1200; user-select:none;">
+                🍺 Beer Points: <span id="beerPoints">0</span>
+            </div>
+            </div>
+
+            <!-- Container for animated beer mugs -->
+            <div id="beerContainer" class="beer-container">
+                <!-- Beer mugs will be dynamically added here via JavaScript -->
+            </div>
+        </div>
+
+        <!-- Authentication Script -->
+        <script>
+            // Check authentication when page loads
+            window.addEventListener('DOMContentLoaded', function() {
+                checkAuthentication();
+                trackActiveDay(); // Track that user is active today
+            });
+
+            function checkAuthentication() {
+                const token = localStorage.getItem('userToken');
+                
+                if (!token) {
+                    // User not logged in - redirect to login page
+                    window.location.href = 'login.html';
+                } else {
+                    // User is logged in - display user info
+                    displayUserInfo();
+                }
+            }
+
+            function displayUserInfo() {
+                const userName = localStorage.getItem('userName');
+                const userEmail = localStorage.getItem('userEmail');
+                const userPicture = localStorage.getItem('userPicture');
+                
+                console.log('Logged in as:', userName);
+                
+                const userInfoDiv = document.getElementById('userInfo');
+                if (userInfoDiv) {
+                    userInfoDiv.innerHTML = `
+                        <img src="${userPicture}" alt="${userName}" onclick="window.location.href='profile.html'" title="View Profile">
+                        <span>Welcome, ${userName}!</span>
+                        <button class="profile-btn" onclick="window.location.href='profile.html'">Profile</button>
+                        <button class="logout-btn" onclick="logout()">Logout</button>
+                    `;
+                }
+            }
+
+            function logout() {
+                // Clear all stored user data
+                localStorage.removeItem('userToken');
+                localStorage.removeItem('userName');
+                localStorage.removeItem('userEmail');
+                localStorage.removeItem('userPicture');
+                
+                // Redirect to login page
+                window.location.href = 'login.html';
+            }
+
+            // Stats tracking functions
+            function trackActiveDay() {
+                const today = new Date().toDateString();
+                const lastActive = localStorage.getItem('lastActiveDay');
+                
+                if (lastActive !== today) {
+                    localStorage.setItem('lastActiveDay', today);
+                    incrementStat('days');
+                }
+            }
+
+            function incrementStat(statName) {
+                const current = parseInt(localStorage.getItem(`stat_${statName}`) || '0');
+                localStorage.setItem(`stat_${statName}`, (current + 1).toString());
+            }
+
+            function startSession() {
+                incrementStat('sessions');
+            }
+
+            function trackBeer() {
+                incrementStat('beers');
+            }
+        </script>
+
+    <script type="module" src="pressure.js"></script>
+    </body>
+</html>

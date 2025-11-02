@@ -1,0 +1,205 @@
+/* Global styles and variables */
+:root {
+    --gold: #FFD700;
+    --amber: #FFA500;
+    --foam: #FFFFFF;
+    --dark: #1a1a1a;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-image: url('assets/beerBackground.jpg'); /* your image path */
+    background-size: cover;       /* make it fill the screen */
+    background-position: center;  /* center the image */
+    background-repeat: no-repeat; /* prevent tiling */
+    min-height: 100vh;
+    font-family: 'Arial', sans-serif;
+    overflow: hidden;
+}
+
+.container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Neon title styling */
+.neon-title {
+    font-family: 'Irish Grover', cursive;
+    font-size: 3.5rem;
+    color: var(--foam);
+    text-align: center;
+    margin: 10px 0;
+    text-shadow: 
+        0 0 7px var(--foam),
+        0 0 10px var(--foam),
+        0 0 21px var(--gold),
+        0 0 42px var(--gold),
+        0 0 82px var(--amber),
+        0 0 92px var(--amber);
+    animation: neon-pulse 1.5s ease-in-out infinite alternate;
+}
+
+/* Video container and webcam styling */
+.video-container {
+    position: relative;
+    width: 52.5vw;
+    height: 85vh;
+    margin: 10px auto;
+    border: 4px solid var(--gold);
+    border-radius: 4px;
+    overflow: hidden;
+    transform: scale(1);
+    transform-origin: center center;
+}
+
+#webcam {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transform: scale(0.95); /* Slight zoom out effect */
+}
+
+/* Start button styling */
+.start-button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 15px 30px;
+    font-size: 1.5rem;
+    background-color: var(--gold);
+    color: var(--dark);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.start-button:hover {
+    background-color: var(--amber);
+    transform: translate(-50%, -50%) scale(1.1);
+}
+
+/* Beer container and animations */
+.beer-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.beer-mug {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    opacity: 0.7;
+}
+
+/* Keyframe animations */
+@keyframes neon-pulse {
+    from {
+        text-shadow: 
+            0 0 7px var(--foam),
+            0 0 10px var(--foam),
+            0 0 21px var(--gold),
+            0 0 42px var(--gold);
+    }
+    to {
+        text-shadow: 
+            0 0 7px var(--foam),
+            0 0 10px var(--foam),
+            0 0 21px var(--gold),
+            0 0 42px var(--gold),
+            0 0 82px var(--amber),
+            0 0 92px var(--amber);
+    }
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(0) rotate(0deg);
+    }
+    50% {
+        transform: translateY(-20px) rotate(5deg);
+    }
+    100% {
+        transform: translateY(0) rotate(0deg);
+    }
+}
+
+@keyframes wobble {
+    0%, 100% {
+        transform: rotate(-3deg);
+    }
+    50% {
+        transform: rotate(3deg);
+    }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .neon-title {
+        font-size: 2.5rem;
+    }
+    
+    .video-container {
+        width: 95vw;
+        height: 60vh;
+    }
+}
+
+/* CSS-only bouncing beer counter (arena + counter) */
+.beer-container {
+    /* use existing overlay as arena for the counter */
+    overflow: hidden; /* keep the counter inside bounds */
+    pointer-events: none; /* allow clicks to pass through unless child overrides */
+}
+
+:root {
+    /* defaults for the beer counter size so keyframes can use CSS vars */
+    --beer-w: 88px;
+    --beer-h: 48px;
+}
+
+.beer-counter {
+    position: absolute;
+    width: var(--beer-w);
+    height: var(--beer-h);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 248, 220, 0.95); /* light beer-card */
+    color: #6b3e00;
+    font-weight: 700;
+    border-radius: 8px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+    left: 0;
+    top: 0;
+    pointer-events: auto; /* allow hover/click if needed */
+
+    /* Two independent animations for X and Y using alternate so it bounces */
+    animation:
+        moveX 4.2s linear infinite alternate,
+        moveY 3.4s linear infinite alternate;
+}
+
+@keyframes moveX {
+    from { left: 0; }
+    to   { left: calc(100% - var(--beer-w)); }
+}
+
+@keyframes moveY {
+    from { top: 0; }
+    to   { top: calc(100% - var(--beer-h)); }
+}
+
+/* Respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+    .beer-counter { animation: none; }
+}
